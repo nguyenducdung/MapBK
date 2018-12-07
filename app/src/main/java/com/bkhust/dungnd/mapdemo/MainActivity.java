@@ -1,10 +1,15 @@
 package com.bkhust.dungnd.mapdemo;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -14,22 +19,43 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, android.location.LocationListener {
+import java.io.File;
+
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, android.location.LocationListener, View.OnClickListener {
     public static double lati;
     public static double longi;
     private GoogleMap mGoogleMap;
     private LocationManager locationManager;
+    private ImageButton btnCapture;
+    private ImageButton btnZoomIn;
+    private ImageButton btnZoomOut;
+    private RelativeLayout rootContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getLocation();
+        initView();
+        implementClickEvents();
+    }
+
+    private void implementClickEvents() {
+        btnCapture.setOnClickListener(this);
+        btnZoomIn.setOnClickListener(this);
+        btnZoomOut.setOnClickListener(this);
+    }
+
+    private void initView() {
+        btnCapture = findViewById(R.id.btn_capture);
+        btnZoomIn = findViewById(R.id.btn_zoom_in);
+        btnZoomOut = findViewById(R.id.btn_zoom_out);
+        rootContent = findViewById(R.id.relative);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        getLocation();
     }
 
     @Override
@@ -77,6 +103,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } catch (SecurityException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_capture:
+                takeScreenshot();
+                break;
+            case R.id.btn_zoom_in:
+                break;
+            case R.id.btn_zoom_out:
+                break;
+            default:
+                break;
+        }
+    }
+
+    /*  Method which will take screenshot on Basis of Screenshot Type ENUM  */
+    private void takeScreenshot() {
+        Bitmap b = null;
+        b = ScreenshotUtils.getScreenShot(rootContent);
     }
 
 }
