@@ -1,6 +1,8 @@
 package com.bkhust.dungnd.mapdemo;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
@@ -19,7 +21,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, android.location.LocationListener, View.OnClickListener {
     public static double lati;
@@ -51,11 +53,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         btnZoomIn = findViewById(R.id.btn_zoom_in);
         btnZoomOut = findViewById(R.id.btn_zoom_out);
         rootContent = findViewById(R.id.relative);
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        getLocation();
     }
 
     @Override
@@ -105,15 +109,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    @SuppressLint("ShowToast")
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_capture:
-                takeScreenshot();
+                Intent intent = new Intent(MainActivity.this, CustomActivity.class);
+                takeScreenshot(intent);
+                startActivity(intent);
                 break;
             case R.id.btn_zoom_in:
+                Toast.makeText(this, "Zoom in", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.btn_zoom_out:
+                Toast.makeText(this, "Zoom out", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;
@@ -121,9 +130,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     /*  Method which will take screenshot on Basis of Screenshot Type ENUM  */
-    private void takeScreenshot() {
-        Bitmap b = null;
-        b = ScreenshotUtils.getScreenShot(rootContent);
+    private void takeScreenshot(Intent intent) {
+        Bitmap b = ScreenshotUtils.takeScreenShortofRootView(rootContent);
+        ByteArrayOutputStream bStream = new ByteArrayOutputStream();
+        b.compress(Bitmap.CompressFormat.PNG, 100, bStream);
+        byte[] byteArray = bStream.toByteArray();
+        intent.putExtra("b", byteArray);
     }
 
 }

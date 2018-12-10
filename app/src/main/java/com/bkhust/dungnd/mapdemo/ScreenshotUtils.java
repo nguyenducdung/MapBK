@@ -16,12 +16,19 @@ import java.io.FileOutputStream;
 public class ScreenshotUtils {
 
     /*  Method which will return Bitmap after taking screenshot. We have to pass the view which we want to take screenshot.  */
-    public static Bitmap getScreenShot(View view) {
-        View screenView = view.getRootView();
-        screenView.setDrawingCacheEnabled(true);
-        Bitmap bitmap = Bitmap.createBitmap(screenView.getDrawingCache());
-        screenView.setDrawingCacheEnabled(false);
+    static Bitmap takeScreenShort(View v) {
+        //noinspection deprecation
+        v.setDrawingCacheEnabled(true);
+        //noinspection deprecation
+        v.buildDrawingCache(true);
+        @SuppressWarnings("deprecation") Bitmap bitmap = Bitmap.createBitmap(v.getDrawingCache());
+        //noinspection deprecation
+        v.setDrawingCacheEnabled(false);
         return bitmap;
+    }
+
+    public static Bitmap takeScreenShortofRootView(View v) {
+        return takeScreenShort(v.getRootView());
     }
 
 
