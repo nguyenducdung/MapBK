@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -23,14 +25,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.ByteArrayOutputStream;
 
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, android.location.LocationListener, View.OnClickListener {
     public static double lati;
     public static double longi;
     private GoogleMap mGoogleMap;
     private LocationManager locationManager;
     private ImageButton btnCapture;
-    private ImageButton btnZoomIn;
-    private ImageButton btnZoomOut;
+    private MapView mapView;
     private RelativeLayout rootContent;
 
     @Override
@@ -40,20 +42,36 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         getLocation();
         initView();
         implementClickEvents();
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mapView.onStop();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mapView.onStart();
     }
 
     private void implementClickEvents() {
         btnCapture.setOnClickListener(this);
-        btnZoomIn.setOnClickListener(this);
-        btnZoomOut.setOnClickListener(this);
     }
 
     private void initView() {
         btnCapture = findViewById(R.id.btn_capture);
-        btnZoomIn = findViewById(R.id.btn_zoom_in);
-        btnZoomOut = findViewById(R.id.btn_zoom_out);
+        mapView = findViewById(R.id.map_view);
         rootContent = findViewById(R.id.relative);
-
     }
 
     @Override
@@ -118,12 +136,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 takeScreenshot(intent);
                 startActivity(intent);
                 break;
-            case R.id.btn_zoom_in:
-                Toast.makeText(this, "Zoom in", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.btn_zoom_out:
-                Toast.makeText(this, "Zoom out", Toast.LENGTH_SHORT).show();
-                break;
             default:
                 break;
         }
@@ -131,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     /*  Method which will take screenshot on Basis of Screenshot Type ENUM  */
     private void takeScreenshot(Intent intent) {
-        Bitmap b = ScreenshotUtils.takeScreenShortofRootView(rootContent);
+        Bitmap b = ScreenshotUtils.takeScreenShortofRootView(mapView);
         ByteArrayOutputStream bStream = new ByteArrayOutputStream();
         b.compress(Bitmap.CompressFormat.PNG, 100, bStream);
         byte[] byteArray = bStream.toByteArray();
